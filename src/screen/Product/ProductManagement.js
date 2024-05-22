@@ -1,4 +1,4 @@
-import { View, FlatList, TextInput, Button, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import { View, FlatList, TextInput, Button, Text, StyleSheet, TouchableOpacity, Image, Alert} from 'react-native';
 import React, { useState , useEffect } from 'react';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -14,42 +14,76 @@ const HomeManager = () =>{
     const [arrList, setArrList] = useState(route.params?.arrList ?? []); // Cập nhật useState để sử dụng setArrList
     const [idPrs, setID] = useState(route.params?.idPr); // Khởi tạo id ban đầu
     console.log('updatedProduct',route.params?.updateItem);
-
+    //đọc dữ liệu
+    const getListProduct = () => {
+      fetch('http://192.168.232.194/apiProduct/readProduct.php',{
+        method: "GET"
+      }).then(res => { 
+        return res.json();
+      }).then(resJson => {
+        if(resJson){
+          console.log('resJson', resJson);
+          setArrList(resJson); 
+        } 
+      }).catch(err => {
+        console.log('err',err);
+      })  
+    } 
     //xử lý xóa
     const removeProduct = (idPr) => {
       console.log('idText:', idPr);
-      manager.removeProduct(idPr);
+      //manager.removeProduct(idPr);
         const removeList = arrList.filter(item => item.idPr !== idPr); // xóa đồng bộ
         //Xóa id 
-        setID(prevID => prevID - 1);
-        setArrList(removeList);
+        // setID(prevID => prevID - 1);
+
       console.log('arr2', manager.epls);
+      fetch(`http://192.168.232.194/apiProduct/deleteProduct.php?idPr=${idPr}`, {
+            method: "DELETE",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idPr: idPr, 
+            })
+        }).then((response) => {
+            return response.json()
+        }).then((responseJson) => {
+            Alert.alert(JSON.stringify(responseJson));
+        }).catch((error) => {
+            console.error('error: ', error);
+        })
+        setArrList(removeList);
     };
-    //cập nhật lại dữ liệu 
-    useEffect(() => {
+    //cập nhật lại dữ liệu  
+    useEffect(() => { 
+      //đọc dữ liệu 
+      console.log('Test');
+      getListProduct();
       //cập nhật add
-      if (route.params?.arrList) {
-        // Tính toán ID mới
-        const newIDPr = arrList.length > 0 ? Math.max(...arrList.map(item => item.idPr)) + 1 : 1;
-        console.log('newID', newIDPr);
-        //set dữ liệu vào mảng
-        setArrList(prevState => prevState.concat(route.params.arrList.map(item => ({ ...item, idPr: newIDPr })))); // Thêm ID mới vào mỗi phần tử trong arrList
-        ///setArrList(route.params?.arrList);
-      }
+      // if (route.params?.arrList) {
+      //   //Tính toán ID mới
+      //   const newIDPr = arrList.length > 0 ? Math.max(...arrList.map(item => item.idPr)) + 1 : 1;
+      //   console.log('newID', newIDPr);
+      //   //set dữ liệu vào mảng
+      //   setArrList(prevState => prevState.concat(route.params.arrList.map(item => ({ ...item, idPr: newIDPr })))); // Thêm ID mới vào mỗi phần tử trong arrList
+      //   ///setArrList(route.params?.arrList); 
+      // }
       ///cập nhật update
-      if (route.params?.updateItem) {
-        // Tạo một bản sao mới của arrList
-        const updatedProductList = [...arrList];
+      // if (route.params?.updateItem) {
+        // // Tạo một bản sao mới của arrList
+        // const updatedProductList = [...arrList];
   
-        // Tìm kiếm sản phẩm trong danh sách với id tương ứng và cập nhật giá trị
-        const indexToUpdate = updatedProductList.findIndex(product => product.idPr === route.params.updateItem.idPr);
-        ///console.log('indexToUpdate',indexToUpdate);
-        if (indexToUpdate !== -1) {
-          updatedProductList[indexToUpdate] = route.params.updateItem;
-          // Cập nhật danh sách sản phẩm
-          setArrList(updatedProductList);
-        }
-      }
+        // // Tìm kiếm sản phẩm trong danh sách với id tương ứng và cập nhật giá trị
+        // const indexToUpdate = updatedProductList.findIndex(product => product.idPr === route.params.updateItem.idPr);
+        // ///console.log('indexToUpdate',indexToUpdate);
+        // if (indexToUpdate !== -1) {
+        //   updatedProductList[indexToUpdate] = route.params.updateItem;
+        //   // Cập nhật danh sách sản phẩm
+        //   setArrList(updatedProductList);
+        // }
+      // } 
   }, [route.params?.arrList, route.params?.updateItem]);
     return (
         <View style={styles.homeManager}>
@@ -81,7 +115,6 @@ const HomeManager = () =>{
                         </View>
                     </View>
                   </TouchableOpacity>
-                    
                 )}
                 keyExtractor={(item,index)=> index.toString()}
             />

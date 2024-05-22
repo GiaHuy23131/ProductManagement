@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import Admin from "../Class/Admin";
 export default class Manager{
     constructor(){
@@ -7,10 +8,32 @@ export default class Manager{
     addProduct(idPr, namePr,typePr,pricePr,descriptionPr,imagePr){
         const newProduct = new Admin(idPr, namePr,typePr,pricePr,descriptionPr,imagePr);
         this.epls.push(newProduct);
-    }
+        fetch('http://192.168.232.194/apiProduct/createProduct.php', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idPr: idPr,
+                namePr: namePr,
+                typePr: typePr,
+                pricePr: pricePr,
+                descriptionPr: descriptionPr,
+                imagePr: imagePr,
+            })
+        }).then((response) => {
+            return response.json()
+        })
+            .then((responseJson) => {
+                Alert.alert(JSON.stringify(responseJson));
+            }).catch((error) => {
+                console.error(error);
+            })
+    };
     //hiển thị sản phẩm
-    showProduct(){
-        let result = "";
+    showProduct(){ 
+        let result = ""; 
         this.epls.forEach((product,index) => {
             result +=`${index +1} Id ${ product.idPr} Tên ${ product.namePr},- Loại ${ product.typePr},- Giá ${ product.pricePr},- Mô tả ${ product.descriptionPr},- Hình ảnh ${ product.imagePr}\n` 
         });
@@ -31,18 +54,27 @@ export default class Manager{
     }
     //sửa sản phẩm
     updateProduct(idPr, namePr,typePr,pricePr,descriptionPr,imagePr){
-        const admin = new Admin(idPr, namePr,typePr,pricePr,descriptionPr,imagePr);
-        // for (let i = 0; i < admin.length; i++) {
-        //     if(this.epls[i].idPr === idPr){
-        //         this.epls[i].setNamePr(namePr);
-        //         this.epls[i].setTypePr(typePr);
-        //         this.epls[i].setPricePr(pricePr);
-        //         this.epls[i].setDescription(descriptionPr);
-        //         this.epls[i].setImagePr(imagePr);
-        //         return this.epls[i];
-        //     }
-        // }
-        console.log("Product  " + admin.getNamePr());
+        fetch(`http://192.168.232.194/apiProduct/updateProduct.php?idPr=${idPr}`, {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idPr: idPr,
+                namePr: namePr,
+                typePr: typePr,
+                pricePr: pricePr,
+                descriptionPr: descriptionPr,
+                imagePr: imagePr,
+            })
+        }).then((res) => {
+            return res.json()
+        }).then((resJson) => {
+            Alert.alert(JSON.stringify(resJson));
+        }).catch((err) => {
+            console.error('error: ', err);
+        })
     }
     //xóa hình ảnh
     removeImage(imagePr){

@@ -20,12 +20,12 @@ const ManagerProduct = () => {
   //Dropdown-picker
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
+  const [items, setItems] = useState([ 
     { label: 'Ao', value: 'Áo' },
     { label: 'Quan', value: 'Quần' },
   ]);
   //    
-  const [id, setID] = useState(1);
+  const [id, setID] = useState('');
   const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [price, setPrice] = useState('');
@@ -48,26 +48,34 @@ const ManagerProduct = () => {
   }
   //Xử lý thêm
   const handleAddProduct = () => {
-    setID(prevID => prevID + 1);
+    //const newIDPr = manager.epls.length > 0 ? Math.max(...manager.epls.map(item => item.idPr)) + 1 : 1;
+    //console.log('newID', newIDPr);
+    //set dữ liệu vào mảng
+    //setArrList(prevState => prevState.concat(manager.epls.map(item => ({ ...item, idPr: newIDPr })))); // Thêm ID mới vào mỗi phần tử trong arrList
     // Cập nhật arrList sau khi thêm sản phẩm mới
     manager.addProduct(id, name, type, price, description, arrListtImage);
     console.log('Add', manager.epls);
+    // Tính toán ID mới
+
+    
     // Reset input fields
-    navigation.navigate('ProductManagement', { arrList: manager.epls, idPr: id });
+    navigation.navigate('ProductManagement', { arrList: manager.epls });
   };
   //Xử lý sửa
-  const handleUpdateProduct = (item) => {
-    const updateItem = ({
-      ...item, 
-      idPr: id,
-      namePr: name, 
-      typePr: type, 
-      pricePr: price, 
-      descriptionPr: description, 
-      imagePr: arrListtImage,
-    });
+  const handleUpdateProduct = () => {
+    manager.updateProduct(id, name, type, price, description, arrListtImage);
+    // const updateItem = ({
+    //   ...item,  
+    //   idPr: id,
+    //   namePr: name, 
+    //   typePr: type, 
+    //   pricePr: price, 
+    //   descriptionPr: description, 
+    //   imagePr: arrListtImage,
+    // });
     //console.log('arrItem',updateItem);
-    navigation.navigate('ProductManagement',{updateItem: updateItem});
+    // navigation.navigate('ProductManagement',{updateItem: updateItem});
+    navigation.navigate('ProductManagement',{ arrList: manager.epls });
   };
   // Khai báo hàm onPressButton và biến buttonText
   let onPressButton;
