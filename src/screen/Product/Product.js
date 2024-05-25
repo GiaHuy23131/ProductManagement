@@ -52,14 +52,14 @@ const ManagerProduct = () => {
     //console.log('newID', newIDPr);
     //set dữ liệu vào mảng
     //setArrList(prevState => prevState.concat(manager.epls.map(item => ({ ...item, idPr: newIDPr })))); // Thêm ID mới vào mỗi phần tử trong arrList
-    // Cập nhật arrList sau khi thêm sản phẩm mới
+    // Cập nhật arrList sau khi thêm sản phẩm mớ
     manager.addProduct(id, name, type, price, description, arrListtImage);
     console.log('Add', manager.epls);
     // Tính toán ID mới
 
     
     // Reset input fields
-    navigation.navigate('ProductManagement', { arrList: manager.epls });
+    navigation.navigate('ProductManagement');
   };
   //Xử lý sửa
   const handleUpdateProduct = () => {
@@ -75,7 +75,7 @@ const ManagerProduct = () => {
     // });
     //console.log('arrItem',updateItem);
     // navigation.navigate('ProductManagement',{updateItem: updateItem});
-    navigation.navigate('ProductManagement',{ arrList: manager.epls });
+    navigation.navigate('ProductManagement');
   };
   // Khai báo hàm onPressButton và biến buttonText
   let onPressButton;
@@ -119,7 +119,7 @@ const ManagerProduct = () => {
     manager.removeImage(imagePr);
     const deleteImage = arrListtImage.filter(item => item !== imagePr); // xóa đồng bộ
     setArrListImage(deleteImage);
-  }
+  } 
   return (
     <View style={styles.container}>
       <View style={styles.addProduct}>
@@ -133,7 +133,7 @@ const ManagerProduct = () => {
           setItems={setItems}
           defaultOption={{ label: 'Ao', value: 'Áo' }}
           onChangeValue={(item) => {
-            console.log("Selected item:", item);
+            console.log("Selected item:", item); 
             setType(item)
           }}//xử lý được chọn
           style={styles.selectList}
