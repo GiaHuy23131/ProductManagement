@@ -70,8 +70,8 @@ const DrawerNav = () => {
 
     <Drawer.Navigator 
     screenOptions={{headerShown : false}}>
-        <Drawer.Screen name='DiscountCodeManagement' component={ProductManagementStackScreen} />
-        <Drawer.Screen name='DiscountManagerment' component={DiscountCodeManagementStackScreen} />
+        <Drawer.Screen name='DiscountManagement' component={ProductManagementStackScreen} />
+        <Drawer.Screen name='DiscountCodeManagement' component={DiscountCodeManagementStackScreen} />
     </Drawer.Navigator>
   )
 }

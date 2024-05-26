@@ -1,7 +1,10 @@
 import { Alert } from "react-native";
+import React, { Component, useState, useEffect } from "react";
 import Admin from "../Class/Admin";
-import { database } from "../FireBase/firebaseConfig";
-import { child, push, ref, set, remove,update } from "firebase/database";
+import { storage, database } from "../FireBase/firebaseConfig";
+import { child, push, ref as databaseRef, set, remove, update } from "firebase/database";
+import { ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject,getMetadata } from "firebase/storage";
+import * as FileSystem from 'expo-file-system';
 
 export default class Manager {
     constructor() {
@@ -13,8 +16,8 @@ export default class Manager {
         // const newProduct = new Admin(idPr, namePr, typePr, pricePr, descriptionPr, imagePr);
         // this.epls.push(newProduct);
         //FireBase
-        const newKey = push(child(ref(database), 'product')).key;//id ramdon
-        set(ref(database, 'product/' + newKey), {
+        const newKey = push(child(databaseRef(database), 'product')).key;//id ramdon
+        set(databaseRef(database, 'product/' + newKey), {
             idPr: newKey,
             namePr: namePr,
             typePr: typePr,
@@ -22,9 +25,10 @@ export default class Manager {
             descriptionPr: descriptionPr,
             imagePr: imagePr,
         }).then(() => {
-            Alert.alert('Thêm thành công')
+            Alert.alert('Thêm thành công');
+            this.imageUploading(newKey, imagePr);
         })
-            .catch((error) => {
+            .catch((error) => { 
                 console.error(error);
             });
         //Api php
@@ -51,12 +55,70 @@ export default class Manager {
         //         console.error(error);
         //     })
     };
+    //Image upload
+    async imageUploading(idPr, imagePr) {
+        try {
+            for (const imageUri of imagePr) {
+                console.log('imagePr', imageUri);
+                //xử lý đường dẫn trong file
+                const fileInfo = await FileSystem.getInfoAsync(imageUri);
+                console.log('fileInfo', fileInfo);
+                if (!fileInfo.exists) {
+                    throw new Error('File does not exist');
+                }
+
+                // Chuyển đổi hình ảnh sang blob
+                const blobImage = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = function () {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = function () {
+                        reject(new TypeError('Network request failed'));
+                    };
+                    xhr.responseType = 'blob';
+                    xhr.open('GET', imageUri, true);
+                    xhr.send(null);
+                });
+                console.log('imageUri', imageUri);
+                const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+                //console.log('fileName',fileName);
+                const storageRefs = storageRef(storage, `images/${idPr}/` + fileName);
+                const uploadTask = uploadBytesResumable(storageRefs, blobImage);
+
+                // Giám sát quá trình tải lên
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        // Tiến trình tải lên
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload is ' + progress + '% done');
+                    },
+                    (error) => {
+                        // Xử lý lỗi tải lên
+                        console.error('Upload failed', error);
+                        setUploading(false);
+                    },
+                    async () => {
+                        // Xử lý khi tải lên hoàn tất
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        console.log('File available at', downloadURL);
+                        //Alert.alert('Image uploaded', 'Image uploaded successfully!');
+                        // Giải phóng blob
+                        blobImage.close();
+                    }
+                );
+            }
+            //Alert.alert('Image upload', 'All images have been uploaded successfully');
+        } catch (error) {
+            console.error(error);
+        }
+    }
     //hiển thị sản phẩm
     showProduct() {
 
     }
     //xóa sản phẩm
-    removeProduct(idPr) {
+    async removeProduct(idPr,imagePr) {
         //sắp xếp id
         // for (let i = 0; i < this.epls.length; i++) {
         //     if (this.epls[i].getIdPr() == idPr) {
@@ -68,8 +130,33 @@ export default class Manager {
         //         return this.epls;
         //     }
         // }
-        remove(ref(database, 'product/' + idPr));
-        alert('remove');
+        remove(databaseRef(database, 'product/' + idPr)).then(() => {
+            Alert.alert('remove product');
+        }).catch((error) => {
+            console.error(error);
+        })     
+        for (const imageUri of imagePr) {
+            console.log('imagePr', imageUri);
+                //xử lý đường dẫn trong file 
+                const fileInfo = await FileSystem.getInfoAsync(imageUri); 
+                console.log('fileInfo', fileInfo);
+                if (!fileInfo.exists) {
+                    throw new Error('File does not exist');
+                }
+                const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+                //console.log('fileName',fileName);
+                const imagePath = `images/${idPr}/` + fileName;
+                console.log('imagePath',imagePath);
+                const ref = storageRef(storage, imagePath);
+                // Tiếp tục xóa tệp
+                deleteObject(ref)
+                    .then(() => {
+                        //alert('Đã xóa hình ảnh');
+                    })
+                    .catch((error) => {
+                        console.error('Lỗi khi xóa tệp:', error);
+                    });
+        }
     };
     //sửa sản phẩm
     updateProduct(idPr, namePr, typePr, pricePr, descriptionPr, imagePr) {
@@ -95,7 +182,7 @@ export default class Manager {
         //     console.error('error: ', err);
         // })
         // A post entry.
-        update(ref(database, 'product/' + idPr), {
+        update(databaseRef(database, 'product/' + idPr), {
             namePr: namePr,
             typePr: typePr,
             pricePr: pricePr,
@@ -103,6 +190,7 @@ export default class Manager {
             imagePr: imagePr,
         }).then(() => {
             Alert.alert('Sửa thành công')
+            this.imageUploading(idPr,imagePr);
         })
             .catch((error) => {
                 console.error(error);

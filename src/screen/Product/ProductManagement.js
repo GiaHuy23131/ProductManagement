@@ -45,10 +45,9 @@ const HomeManager = () =>{
         }); 
       } 
     //xử lý xóa
-    const removeProduct = (idPr) => { 
+    const removeProduct = (idPr,imagePr) => { 
       console.log('idText:', idPr);
-      manager.removeProduct(idPr);
-      // fetch(`http://192.168.232.194/apiProduct/deleteProduct.php?idPr=${idPr}`, {
+      manager.removeProduct(idPr,imagePr);
       //       method: "DELETE",
       //       headers: {
       //           'Accept': 'application/json',
@@ -68,7 +67,7 @@ const HomeManager = () =>{
     }; 
     //cập nhật lại dữ liệu     
     useEffect(() => {  
-      //đọc dữ liệu 
+      //đọc dữ liệu   
       getListProduct();
       console.log('arr',arrList); 
   }, []);
@@ -97,7 +96,7 @@ const HomeManager = () =>{
                             <IconButton
                                 icon="delete"
                                 size={25}
-                                onPress={() => removeProduct(item.idPr)}
+                                onPress={() => removeProduct(item.idPr,item.imagePr)}
                             />
                         </View>
                     </View>
