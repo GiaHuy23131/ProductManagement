@@ -12,6 +12,7 @@ import Product from './src/screen/Product/Product';
 import ProductManagement from './src/screen/Product/ProductManagement';
 import DiscountManagerment from './src/screen/DiscountCode/DiscountCodeManagement';
 import DiscountCode from './src/screen/DiscountCode/DiscountCode';
+import ListColor from './src/Components/ListColor';
 const ProductManagementStack = createNativeStackNavigator();
 //Product
 const ProductManagementStackScreen =() => {
@@ -36,6 +37,7 @@ const ProductManagementStackScreen =() => {
         }
       }}/>
       <ProductManagementStack.Screen name='Product' component={Product} options={{headerTitleAlign: 'center'}}/>
+      <ProductManagementStack.Screen name='ListColor' component={ListColor} options={{headerTitleAlign: 'center'}}/>
   </ProductManagementStack.Navigator>
   ) 
 }

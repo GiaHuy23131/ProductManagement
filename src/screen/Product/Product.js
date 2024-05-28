@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from "react";
-import { View, Text, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, FlatList, Image, Alert } from "react-native";
+import { View, Modal, Text, Pressable, SafeAreaView, TextInput, StyleSheet, TouchableOpacity, FlatList, Image, Alert } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation, useRoute } from '@react-navigation/native'; // Import navigation hook
 import { IconButton, MD3Colors } from 'react-native-paper';
@@ -8,9 +8,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { storage, database } from "../../FireBase/firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import * as FileSystem from 'expo-file-system';
-import { v4 as uuidv4 } from 'uuid';
 // 
 import Manager from "../../Components/Manager";
+import ListColor from "../../Components/ListColor";
+import Color from "../../Class/Color";
 
 const ManagerProduct = () => {
 
@@ -21,6 +22,8 @@ const ManagerProduct = () => {
   const { item, detail, flag } = route.params ?? { arrList: [] };
   const [details, setDetais] = useState(detail);
   const [flags, setFlags] = useState(flag ?? false);
+  const [modalVisible, setModalVisible] = useState(false);
+
   //Dropdown-picker
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -28,30 +31,28 @@ const ManagerProduct = () => {
     { label: 'Ao', value: 'Áo' },
     { label: 'Quan', value: 'Quần' },
   ]);
+  const [arrColor, setArrColor] = useState([
+    new Color('Trắng', 'white'),
+    new Color('Đen', 'black'),
+    new Color('Xanh Dương', 'blue'),
+    new Color('Xanh lá', 'green'),
+    new Color('Vàng', 'yellow'),
+    new Color('Đỏ', 'red'),
+    new Color('Tím', 'purple'),
+    new Color('Cam', 'orange'),
+  ]);
   //   
-  const [upLoad, setUploading] = useState(false);
   const [id, setID] = useState('');
   const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [price, setPrice] = useState('');
+  const [color, setColor] = useState([]);
   const [arrListImage, setArrListImage] = useState([]);
   const [description, setDescription] = useState('');
   const [manager] = useState(new Manager());
+
   //
-  const [arrList, setArrList] = useState([]);
-  //hàm tạo id ramdon
-  function generateUUID() {
-    let d = new Date().getTime();
-    if (window.performance && typeof window.performance.now === 'function') {
-      d += performance.now(); // Sử dụng độ chính xác cao hơn nếu có
-    }
-    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = (d + Math.random() * 16) % 16 | 0;
-      d = Math.floor(d / 16);
-      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    return uuid;
-  }
+
   //Choose image
   const handleImagePickerPress = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -60,75 +61,18 @@ const ManagerProduct = () => {
       aspect: [1, 1],
       quality: 1,
     })
+
     if (!result.canceled) {
+      setModalVisible(true);
       setArrListImage(prevState => [...prevState, result.assets[0].uri]);
+    } 
+  }
+  const handleColorPress = (color) => {
+    if (color) {
+      setColor(prevState => [...prevState, color]);
+      setModalVisible(false);
     }
   }
-  //upload file
-  // const uploadImage = async () => {
-  //   setUploading(true);
-  //   const randomId = generateUUID(); // Tạo ID ngẫu nhiên
-  //   try {
-  //     for (const imageUri of arrListImage) {
-  //       //xử lý đường dẫn trong file
-  //       const fileInfo = await FileSystem.getInfoAsync(imageUri);
-  //       console.log('arrListImage',arrListImage);
-  //       console.log('imageUri',imageUri);
-  //       console.log('fileInfo',fileInfo);
-  //       if (!fileInfo.exists) {
-  //         throw new Error('File does not exist');
-  //       }
-
-  //       // Chuyển đổi hình ảnh sang blob
-  //       const blobImage = await new Promise((resolve, reject) => {
-  //         const xhr = new XMLHttpRequest();
-  //         xhr.onload = function () {
-  //           resolve(xhr.response);
-  //         };
-  //         xhr.onerror = function () {
-  //           reject(new TypeError('Network request failed'));
-  //         };
-  //         xhr.responseType = 'blob';
-  //         xhr.open('GET', imageUri, true);
-  //         xhr.send(null);
-  //       });
-  //       console.log('imageUri',imageUri);
-  //       const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
-  //       //console.log('fileName',fileName);
-  //       const storageRef = ref(storage, `images/${randomId}/` + fileName);
-  //       const uploadTask = uploadBytesResumable(storageRef, blobImage);
-
-  //       // Giám sát quá trình tải lên
-  //       uploadTask.on('state_changed',
-  //         (snapshot) => {
-  //           // Tiến trình tải lên
-  //           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-  //           console.log('Upload is ' + progress + '% done');
-  //         },
-  //         (error) => {
-  //           // Xử lý lỗi tải lên
-  //           console.error('Upload failed', error);
-  //           setUploading(false);
-  //         },
-  //         async () => {
-  //           // Xử lý khi tải lên hoàn tất
-  //           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-  //           console.log('File available at', downloadURL);
-  //           Alert.alert('Image uploaded', 'Image uploaded successfully!');
-  //           // Giải phóng blob
-  //           blobImage.close();
-  //         }
-  //       );
-  //     }
-
-  //     Alert.alert('Image upload', 'All images have been uploaded successfully');
-  //   } catch (error) {
-  //     console.error('err', error);
-  //   } finally {
-  //     setUploading(false);
-  //   }
-
-  // };
   //Xử lý thêm
   const handleAddProduct = () => {
     //const newIDPr = manager.epls.length > 0 ? Math.max(...manager.epls.map(item => item.idPr)) + 1 : 1;
@@ -137,20 +81,17 @@ const ManagerProduct = () => {
     //setArrList(prevState => prevState.concat(manager.epls.map(item => ({ ...item, idPr: newIDPr })))); // Thêm ID mới vào mỗi phần tử trong arrList
     // Cập nhật arrList sau khi thêm sản phẩm mớ
     if (name == "") {
-      return Alert.alert('Nhập tên');
+      return Alert.alert('Thông báo', 'Nhập tên');
     } else if (type == "") {
-      return Alert.alert('Chọn loại');
+      return Alert.alert('Thông báo', 'Chọn loại');
     } else if (price == "") {
-      return Alert.alert('Nhập giá');
+      return Alert.alert('Thông báo', 'Nhập giá');
     } else if (arrListImage == "") {
-      return Alert.alert('Chọn ảnh');
+      return Alert.alert('Thông báo', 'Chọn ảnh');
     } else if (description == "") {
       return Alert.alert('Nhập mô tả');
     } else {
-      manager.addProduct(id, name, type, price, description, arrListImage);
-      //uploadImage();
-      console.log('Add', manager.epls);
-
+      manager.addProduct(id, name, type, price, description, color, arrListImage);
       // Reset input fields 
       navigation.navigate('ProductManagement');
     }
@@ -158,20 +99,21 @@ const ManagerProduct = () => {
   };
   //Xử lý sửa
   const handleUpdateProduct = () => {
-    manager.updateProduct(id, name, type, price, description, arrListImage);
+    if (name == "") {
+      return Alert.alert('Thông báo', 'Nhập tên');
+    } else if (type == "") {
+      return Alert.alert('Thông báo', 'Chọn loại');
+    } else if (price == "") {
+      return Alert.alert('Thông báo', 'Nhập giá');
+    } else if (arrListImage == "") {
+      return Alert.alert('Thông báo', 'Chọn ảnh');
+    } else if (description == "") {
+      return Alert.alert('Nhập mô tả');
+    } else {
+      manager.updateProduct(id, name, type, price, description, color, arrListImage);
+      navigation.navigate('ProductManagement');
+    }
 
-    // const updateItem = ({
-    //   ...item,  
-    //   idPr: id,
-    //   namePr: name, 
-    //   typePr: type, 
-    //   pricePr: price, 
-    //   descriptionPr: description, 
-    //   imagePr: arrListImage,
-    // });
-    //console.log('arrItem',updateItem);
-    // navigation.navigate('ProductManagement',{updateItem: updateItem});
-    navigation.navigate('ProductManagement');
   };
   // Khai báo hàm onPressButton và biến buttonText
   let onPressButton;
@@ -191,10 +133,12 @@ const ManagerProduct = () => {
         setName(item.namePr);
         setPrice(item.pricePr);
         setDescription(item.descriptionPr);
+        setColor(item.colorPr);
         setArrListImage(item.imagePr);
         setDetais(false);
         // Xử lý sửa sản phẩm
         onPressButton = () => handleUpdateProduct();
+
       }
       else {
         // Xử lý sửa sản phẩm
@@ -209,13 +153,29 @@ const ManagerProduct = () => {
   useEffect(() => {
     clickText();
   }, [handleUpdateProduct, handleAddProduct]);
-  //hàm xóa hình ảnh
+  //hàm xóa hình ảnh and màu
   const handleDeleteImage = (imagePr) => {
-    console.log('deleteImage', imagePr);
-    manager.removeImage(imagePr);
-    const deleteImage = arrListImage.filter(item => item !== imagePr); // xóa đồng bộ
-    setArrListImage(deleteImage);
+    //tìm vị trí image
+    const index = arrListImage.findIndex(arrListImage => arrListImage === imagePr);
+    console.log('index',index);
+    if(index != -1){
+      const indexColor = color[index];
+      console.log('indexColor',indexColor);
+
+      const deleteImage = arrListImage.filter(item => item !== imagePr); 
+      const deleteColor = color.filter(item => item !== indexColor);
+
+      setArrListImage(deleteImage);
+      setColor(deleteColor);
+    }
+    else{
+      console.error("Image not found in arrListImage");
+    }
   }
+
+  //log 
+  console.log('color', color);
+  console.log('image', arrListImage);
   return (
     <View style={styles.container}>
       <View style={styles.addProduct}>
@@ -278,6 +238,33 @@ const ManagerProduct = () => {
           <Text style={styles.buttonText}>Loại bỏ hình</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>Bảng màu</Text>
+            {/* <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity> */}
+          </View>
+          <FlatList
+            data={arrColor}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => handleColorPress(item.color)}>
+                <View style={[styles.imageColor, { backgroundColor: item.color }]} />
+                <Text style={styles.nameColor}>{item.nameColor}</Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.nameColor}
+            numColumns={4}
+          />
+        </View>
+      </Modal>
       <FlatList
         horizontal={true}
         data={arrListImage}
@@ -286,33 +273,7 @@ const ManagerProduct = () => {
             <TouchableOpacity onPress={() => handleDeleteImage(item)}>
               <Text style={styles.deleteButton}>X</Text>
             </TouchableOpacity>
-            {item && <Image source={{ uri: item }} style={styles.image} />}
-          </View>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
-      <FlatList
-        data={arrList}
-        renderItem={({ item }) => (
-          <View style={styles.itemListView}>
-            {item.imagePr[0] && <Image source={{ uri: item.imagePr[0] }} style={styles.image} />}
-            <View>
-              <Text style={styles.textName}>
-                Tên:{item.namePr}
-              </Text>
-              <Text style={styles.textPrice}>
-                Giá:{item.pricePr}
-              </Text>
-              <Text style={styles.textDescription}>
-                Mô tả:{item.descriptionPr}
-              </Text>
-            </View>
-            <View style={styles.iconDelete}>
-              <IconButton
-                icon="delete"
-                size={25}
-              />
-            </View>
+            {item && <Image source={{ uri: item}} style={styles.image} />}
           </View>
         )}
         keyExtractor={(item, index) => index.toString()}
@@ -332,6 +293,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'pink',
+  },
+  centeredView: {
+    flex: 1,
+    backgroundColor: '#C0C0C0',
   },
   product: {
     fontSize: 20,
@@ -444,6 +409,39 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: 'white',
     zIndex: 1, // Đặt zIndex để nút nổi lên trên hình ảnh
+  },
+  imageColor: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    margin: 10,
+  },
+  nameColor: {
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Canh giữa ngang
+    height: '5%',
+    marginBottom: 10,
+    paddingTop: 10,
+    backgroundColor: 'white',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 export default ManagerProduct;

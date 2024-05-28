@@ -1,10 +1,12 @@
 class Admin {
-    constructor (idPr, namePr,typePr,pricePr,descriptionPr,imagePr){
+    
+    constructor (idPr, namePr,typePr,pricePr,descriptionPr,colorPr,imagePr){
         this.idPr = idPr;
         this.namePr = namePr;
         this.typePr = typePr;
         this.pricePr = pricePr;
         this.descriptionPr = descriptionPr;
+        this.colorPr =  Array.isArray(colorPr) ? colorPr : [colorPr];
         this.imagePr = Array.isArray(imagePr) ? imagePr : [imagePr];// kiểm tra xem image phải là một mảng k
     }
     setIdPr (idPr){
@@ -33,6 +35,12 @@ class Admin {
     }
     setDescriptionPr (descriptionPr){
         this.descriptionPr = descriptionPr;
+    }
+    getColorPr(){
+        return this.colorPr;
+    }
+    setColorPr (colorPr){
+        this.colorPr = colorPr;
     }
     getDescriptionPr(){
         return this.descriptionPr;

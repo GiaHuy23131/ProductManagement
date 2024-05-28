@@ -3,7 +3,7 @@ import React, { Component, useState, useEffect } from "react";
 import Admin from "../Class/Admin";
 import { storage, database } from "../FireBase/firebaseConfig";
 import { child, push, ref as databaseRef, set, remove, update } from "firebase/database";
-import { ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject,getMetadata } from "firebase/storage";
+import { ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject, getMetadata } from "firebase/storage";
 import * as FileSystem from 'expo-file-system';
 
 export default class Manager {
@@ -11,7 +11,7 @@ export default class Manager {
         this.epls = [];
     }
     //thêm sản phẩm
-    addProduct(idPr, namePr, typePr, pricePr, descriptionPr, imagePr) {
+    addProduct(idPr, namePr, typePr, pricePr, descriptionPr, colorPr, imagePr) {
         //test 
         // const newProduct = new Admin(idPr, namePr, typePr, pricePr, descriptionPr, imagePr);
         // this.epls.push(newProduct);
@@ -23,12 +23,13 @@ export default class Manager {
             typePr: typePr,
             pricePr: pricePr,
             descriptionPr: descriptionPr,
+            colorPr: colorPr,
             imagePr: imagePr,
         }).then(() => {
             Alert.alert('Thêm thành công');
             this.imageUploading(newKey, imagePr);
         })
-            .catch((error) => { 
+            .catch((error) => {
                 console.error(error);
             });
         //Api php
@@ -113,12 +114,8 @@ export default class Manager {
             console.error(error);
         }
     }
-    //hiển thị sản phẩm
-    showProduct() {
-
-    }
     //xóa sản phẩm
-    async removeProduct(idPr,imagePr) {
+    async removeProduct(idPr, imagePr) {
         //sắp xếp id
         // for (let i = 0; i < this.epls.length; i++) {
         //     if (this.epls[i].getIdPr() == idPr) {
@@ -134,32 +131,31 @@ export default class Manager {
             Alert.alert('remove product');
         }).catch((error) => {
             console.error(error);
-        })     
+        })
         for (const imageUri of imagePr) {
             console.log('imagePr', imageUri);
-                //xử lý đường dẫn trong file 
-                const fileInfo = await FileSystem.getInfoAsync(imageUri); 
-                console.log('fileInfo', fileInfo);
-                if (!fileInfo.exists) {
-                    throw new Error('File does not exist');
-                }
-                const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
-                //console.log('fileName',fileName);
-                const imagePath = `images/${idPr}/` + fileName;
-                console.log('imagePath',imagePath);
-                const ref = storageRef(storage, imagePath);
-                // Tiếp tục xóa tệp
-                deleteObject(ref)
-                    .then(() => {
-                        //alert('Đã xóa hình ảnh');
-                    })
-                    .catch((error) => {
-                        console.error('Lỗi khi xóa tệp:', error);
-                    });
+            //xử lý đường dẫn trong file 
+            const fileInfo = await FileSystem.getInfoAsync(imageUri);
+            console.log('fileInfo', fileInfo);
+            if (!fileInfo.exists) {
+                throw new Error('File does not exist');
+            }
+            const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+            //console.log('fileName',fileName);
+            const imagePath = `images/${idPr}/` + fileName;
+            const ref = storageRef(storage, imagePath);
+            // Tiếp tục xóa tệp
+            deleteObject(ref)
+                .then(() => {
+                    //alert('Đã xóa hình ảnh');
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi xóa tệp:', error);
+                });
         }
     };
     //sửa sản phẩm
-    updateProduct(idPr, namePr, typePr, pricePr, descriptionPr, imagePr) {
+    updateProduct(idPr, namePr, typePr, pricePr, descriptionPr, colorPr, imagePr) {
         // fetch(`http://192.168.232.194/apiProduct/updateProduct.php?idPr=${idPr}`, {
         //     method: "PUT",
         //     headers: {
@@ -187,26 +183,27 @@ export default class Manager {
             typePr: typePr,
             pricePr: pricePr,
             descriptionPr: descriptionPr,
+            colorPr: colorPr,
             imagePr: imagePr,
         }).then(() => {
             Alert.alert('Sửa thành công')
-            this.imageUploading(idPr,imagePr);
+            this.imageUploading(idPr, imagePr);
         })
             .catch((error) => {
                 console.error(error);
             });
     }
     //xóa hình ảnh
-    removeImage(imagePr) {
-        for (let i = 0; i < this.epls.length; i++) {
-            const images = this.epls[i].getImagePr();
-            for (let j = 0; j < images.length; j++) {
-                if (images[i] === imagePr) {
-                    images.splice(j, 1);
-                    return;
-                }
-
-            }
-        }
-    }
+    // removeImage(imagePr) {
+    //     for (let i = 0; i < this.epls.length; i++) {
+    //         const images = this.epls[i].getImagePr();
+    //         for (let j = 0; j < images.length; j++) {
+    //             if (images[i] === imagePr) {
+    //                 images.splice(j, 1);
+    //                 colors.splice(j,1);
+    //                 return;
+    //             }
+    //         }
+    //     }
+    // }
 }

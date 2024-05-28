@@ -15,9 +15,8 @@ const DiscountManagerment = () => {
     const db = ref(database,'discount/')
     onValue(db,(snapshot) => {
       const data = snapshot.val();
-      if(data!== null){ 
-        const arr = Object.values(data); 
-        console.log('123',arr); 
+      if(data!== null){  
+        const arr = Object.values(data);  
         setArrListCode(arr);
       }
       else{

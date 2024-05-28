@@ -12,9 +12,7 @@ const HomeManager = () =>{
     const navigation = useNavigation(); // Sử dụng hook navigation
     const route = useRoute();
     const [manager] = useState(new Manager());
-    const [isLoading, setLoading] = useState(true);
     const [arrList, setArrList] = useState([]);
-    const [idPrs, setID] = useState(route.params?.idPr); // Khởi tạo id ban đầu
     //const dataList = Object.values(arrList); // Chuyển đổi đối tượng thành mảng các mục dữ liệu
     //đọc dữ liệu API PHP   
     //Đọc dữ liệu firebase
@@ -36,7 +34,6 @@ const HomeManager = () =>{
           const data = snapshot.val();
           if(data!== null){ 
             const arr = Object.values(data); 
-            console.log('123',arr); 
             setArrList(arr);
           }
           else{
@@ -46,7 +43,6 @@ const HomeManager = () =>{
       } 
     //xử lý xóa
     const removeProduct = (idPr,imagePr) => { 
-      console.log('idText:', idPr);
       manager.removeProduct(idPr,imagePr);
       //       method: "DELETE",
       //       headers: {
@@ -69,7 +65,7 @@ const HomeManager = () =>{
     useEffect(() => {  
       //đọc dữ liệu   
       getListProduct();
-      console.log('arr',arrList); 
+      console.log('arr',arrList);  
   }, []);
     return (  
         <View style={styles.homeManager}>
