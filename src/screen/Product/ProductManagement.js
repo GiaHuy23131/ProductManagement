@@ -76,6 +76,7 @@ const HomeManager = () =>{
                   <TouchableOpacity onPress={() => {navigation.navigate('Product', { item: item, detail: true , flag: true})
                   }}>
                     <View style={styles.itemListView}>
+                      {console.log(item.imagePr[0])}
                         {item.imagePr[0] && <Image source={{uri: item.imagePr[0]}} style={styles.image} />}
                         <View>
                           <Text style={styles.textName}>
