@@ -17,22 +17,22 @@ const DiscountCode = () => {
   const [id, setID] = useState('');
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const [price, setPrice] = useState('');
+  const [percentage, setPercentage] = useState('');
   const [description, setDescription] = useState('');
   const [managerDiscount] = useState(new ManagerDiscount());
   //Xử lý thêm
   const handleAddDiscount = () => {
-    managerDiscount.addDiscount(id, name, code, price, description, status);
+    managerDiscount.addDiscount(id, name, code, percentage, description, status);
     console.log('Add', managerDiscount.epls);
     // Reset input fields 
-    navigation.navigate('DiscountCodeManagement');
+    navigation.navigate('Quản trị mã giảm giá');
   };
 
 
   //Xử lý sửa
   const handleUpdateDiscount = () => {
-    managerDiscount.updateDiscount(id, name, code, price, description, status);
-    navigation.navigate('DiscountCodeManagement');
+    managerDiscount.updateDiscount(id, name, code, percentage, description, status);
+    navigation.navigate('Quản trị mã giảm giá');
   };
   //Khai báo hàm onPressButton và biến buttonText
   let onPressButton;
@@ -47,12 +47,12 @@ const DiscountCode = () => {
   const clickText = () => {
     if (flags) {
       if (details) {
-        setID(item.idDis);
-        setStatus(item.statusDis);
+        setID(item.id);
+        setStatus(item.status);
         setName(item.nameDis);
-        setPrice(item.priceDis);
+        setPercentage(item.percentage);
         setDescription(item.descriptionDis);
-        setCode(item.codeDis);
+        setCode(item.code);
         setDetais(false);
         // Xử lý sửa sản phẩm
         onPressButton = () => handleUpdateDiscount();
@@ -77,11 +77,11 @@ const DiscountCode = () => {
         <RadioButton.Group onValueChange={newValue => setStatus(newValue)} value={status}>
           <View style={styles.addDiscount}>
             <View style={styles.addDiscount}>
-              <RadioButton value='Kích hoạt' />
+              <RadioButton value='active' />
               <Text>Kích hoạt</Text>
             </View>
             <View style={styles.addDiscount}>
-              <RadioButton value='Chưa áp dụng' />
+              <RadioButton value='inactive' />
               <Text>Chưa áp dụng</Text>
             </View>
           </View>
@@ -113,12 +113,12 @@ const DiscountCode = () => {
       <View style={styles.addDiscount}>
         <Text style={styles.discout}>Giá: </Text>
         <TextInput
-          value={price}
+          value={percentage}
           keyboardType="default"
           placeholder="Nhập giá"
           editable={true}
           style={styles.item}
-          onChangeText={(text) => setPrice(text)}//xử lý văn bản
+          onChangeText={(text) => setPercentage(text)}//xử lý văn bản
         />
       </View>
       <View style={styles.addDiscount}>

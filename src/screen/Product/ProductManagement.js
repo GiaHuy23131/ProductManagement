@@ -73,7 +73,7 @@ const HomeManager = () =>{
                 style={styles.flatList}
                 data={arrList}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => {navigation.navigate('Product', { item: item, detail: true , flag: true})
+                  <TouchableOpacity onPress={() => {navigation.navigate('Sản phẩm', { item: item, detail: true , flag: true})
                   }}>
                     <View style={styles.itemListView}>
                       {console.log(item.imagePr[0])}
@@ -103,7 +103,7 @@ const HomeManager = () =>{
             />
           
             <View style={styles.buttonWrapper}>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Product')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Sản phẩm')}>
                     <Text style={styles.buttonText}>Thêm</Text>
                 </TouchableOpacity>     
                 
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 10,
         fontSize: 18,
-        width:330,
+        width:'100%',
         height: 130,
         marginVertical: 5,
         backgroundColor: 'white',

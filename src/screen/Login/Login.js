@@ -40,12 +40,10 @@ const Login = () => {
           })
           console.log('data2', data);
         }
-
-
       }
       )
       .catch((error) => {
-        console.log('handleLogin')
+        Alert.alert('Đăng nhập','Đăng nhập không thành công');
         //const errorCode = error.code;
         const errorMessage = error.message;
       });

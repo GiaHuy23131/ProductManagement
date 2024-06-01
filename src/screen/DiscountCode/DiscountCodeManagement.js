@@ -12,7 +12,7 @@ const DiscountManagerment = () => {
   const [managerDiscount] = useState(new ManagerDiscount());
   //Đọc dữ liệu firebase
   const getListDiscount = () => {
-    const db = ref(database,'discount/')
+    const db = ref(database,'Discount/')
     onValue(db,(snapshot) => {
       const data = snapshot.val();
       if(data!== null){  
@@ -37,7 +37,7 @@ const DiscountManagerment = () => {
                 style={styles.flatList}
                 data={arrListCode}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => {navigation.navigate('DiscountCode', { item: item, detail: true , flag: true})
+                  <TouchableOpacity onPress={() => {navigation.navigate('Mã giảm giá', { item: item, detail: true , flag: true})
                   }}>
                     <View style={styles.itemListView}>
                         <View>
@@ -45,26 +45,26 @@ const DiscountManagerment = () => {
                             Tên:{item.nameDis} 
                           </Text>
                           <Text style={styles.textPrice}>
-                            Mã:{item.codeDis} 
+                            Mã:{item.percentage} 
                           </Text>
                           <Text style={styles.textName}>
-                            Trạng thái:{item.statusDis} 
+                            Trạng thái:{item.status} 
                           </Text>   
                         </View>
                         <View style={styles.iconDelete}>
                             <IconButton
                                 icon="delete"
                                 size={25}
-                                onPress={() => removeDiscount(item.idDis)}
+                                onPress={() => removeDiscount(item.id)}
                             />
                         </View>
                     </View>
                   </TouchableOpacity>
                 )}
-                keyExtractor={(item,index)=>item.idDis}
+                keyExtractor={(item,index)=>item.id}
             />
             <View style={styles.buttonWrapper}>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('DiscountCode')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Mã giảm giá')}>
                     <Text style={styles.buttonText}>Thêm</Text>
                 </TouchableOpacity>     
             </View>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       padding: 10,
       fontSize: 18,
-      width:330,
+      width:'100%',
       height: 130,
       marginVertical: 5,
       backgroundColor: 'white',

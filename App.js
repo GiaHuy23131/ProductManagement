@@ -7,13 +7,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Entypo';
 import { createStackNavigator } from '@react-navigation/stack';
-import {auth} from './src/FireBase/firebaseConfig';
+import { auth } from './src/FireBase/firebaseConfig';
 //
 import Product from './src/screen/Product/Product';
 import ProductManagement from './src/screen/Product/ProductManagement';
 import DiscountManagerment from './src/screen/DiscountCode/DiscountCodeManagement';
 import DiscountCode from './src/screen/DiscountCode/DiscountCode';
 import Login from './src/screen/Login/Login';
+import ProductConfirmation from './src/screen/ProductConfirmation/ProductConfirmation';
+import ProductDetail from './src/screen/ProductConfirmation/ProductDetail';
 
 const ProductManagementStack = createNativeStackNavigator();
 //Product
@@ -27,7 +29,7 @@ const ProductManagementStackScreen = () => {
   return (
     <ProductManagementStack.Navigator>
       <ProductManagementStack.Screen
-        name='ProductManagement'
+        name='Quản trị sản phẩm'
         component={ProductManagement}
         options={{
           headerTitleAlign: 'center',
@@ -50,7 +52,7 @@ const ProductManagementStackScreen = () => {
             />
           ),
         }} />
-      <ProductManagementStack.Screen name='Product' component={Product} options={{ headerTitleAlign: 'center' }} />
+      <ProductManagementStack.Screen name='Sản phẩm' component={Product} options={{ headerTitleAlign: 'center' }} />
     </ProductManagementStack.Navigator>
   )
 }
@@ -60,7 +62,7 @@ const DiscountCodeManagementStackScreen = () => {
   return (
     <ProductManagementStack.Navigator>
       <ProductManagementStack.Screen
-        name='DiscountCodeManagement'
+        name='Quản trị mã giảm giá'
         component={DiscountManagerment}
         options={{
           headerTitleAlign: 'center',
@@ -75,21 +77,69 @@ const DiscountCodeManagementStackScreen = () => {
             )
           }
         }} />
-      <ProductManagementStack.Screen name='DiscountCode' component={DiscountCode} options={{ headerTitleAlign: 'center' }} />
+      <ProductManagementStack.Screen  name='Mã giảm giá' component={DiscountCode} options={{ headerTitleAlign: 'center' }} />
+    </ProductManagementStack.Navigator>
+  )
+}
+//ProductConfirmation
+const ProductConfirmationtStackScreen = () => {
+  const navigation = useNavigation();
+  return (
+    <ProductManagementStack.Navigator>
+      <ProductManagementStack.Screen
+        name='Xác nhận sản phẩm'
+        component={ProductConfirmation}
+        options={{
+          headerTitleAlign: 'center',
+          headerLeft: () => {
+            return (
+              <Icon
+                name="menu"
+                onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                size={30}
+                color="black"
+              />
+            )
+          }
+        }} />
+      <ProductManagementStack.Screen name='Chi tiết sản phẩm' component={ProductDetail} options={{ headerTitleAlign: 'center' }} />
     </ProductManagementStack.Navigator>
   )
 }
 const DrawerNav = () => {
   const Drawer = createDrawerNavigator();
   return (
-
     <Drawer.Navigator
       screenOptions={{ headerShown: false }}>
-      <Drawer.Screen name='ProductManagementStackScreen' component={ProductManagementStackScreen} />
-      <Drawer.Screen name='DiscountCodeManagement' component={DiscountCodeManagementStackScreen} />
+      <Drawer.Screen
+        name='Xác nhận sản phẩm'
+        component={ProductConfirmationtStackScreen}
+        options={{
+          headerTitleAlign: 'center',
+          drawerIcon: ({color, size }) => (
+            <Icon name="check" size={size} color={color} />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name='Quản trị sản phẩm'
+        component={ProductManagementStackScreen}
+        options={{
+          drawerIcon: ({color, size }) => (
+            <Icon name="shopping-bag" size={size} color={color} />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name='Quản trị mã giảm giá'
+        component={DiscountCodeManagementStackScreen}
+        options={{
+          drawerIcon: ({color, size }) => (
+            <Icon name="price-tag" size={size} color={color} />
+          )
+        }}
+      />
     </Drawer.Navigator>
-    
-
   )
 }
 const StackNav = () => {
@@ -104,7 +154,7 @@ const StackNav = () => {
 export default function App() {
   return (
     <View style={styles.container}>
-      <NavigationContainer> 
+      <NavigationContainer>
         <StackNav />
       </NavigationContainer>
     </View>

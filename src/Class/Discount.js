@@ -1,19 +1,19 @@
 class Discount { 
-    constructor(idDis, nameDis,codeDis, priceDis,fromDateDis,toDateDis,descriptionDis,statusDis){
-        this.idDis = idDis;
+    constructor(id, nameDis,code, percentage,fromDateDis,toDateDis,descriptionDis,status){
+        this.id = id;
         this.nameDis = nameDis;
-        this.codeDis = codeDis;
-        this.priceDis = priceDis;
+        this.code = code;
+        this.percentage = percentage;
         this.fromDateDis = fromDateDis;
         this.toDateDis = toDateDis;
         this.descriptionDis = descriptionDis;
-        this.statusDis = statusDis;
+        this.status = status;
     }
-    setIdDis(idDis){
-        this.idDis = idDis;
+    setId(id){
+        this.id = id;
     }
-    getIdDis(){
-        return this.idDis;
+    getId(){
+        return this.id;
     }
     setNameDis(nameDis){
         this.nameDis = nameDis;
@@ -21,17 +21,17 @@ class Discount {
     getNameDis(){
         return this.nameDis;
     }
-    setCodeDis(codeDis){
-        this.codeDis = codeDis;
+    setCode(code){
+        this.code = code;
     }
-    getCodeDis(){
-        return this.codeDis;
+    getCode(){
+        return this.code;
     }
-    setPriceDis(priceDis){
-        this.priceDis = priceDis;
+    setpercentage(percentage){
+        this.percentage = percentage;
     }
-    getPriceDis(){
-        return this.priceDis;
+    getpercentage(){
+        return this.percentage;
     }
     setFromDateDis(fromDateDis){
         this.fromDateDis = fromDateDis;
@@ -51,11 +51,11 @@ class Discount {
     getDescriptionDis(){
         return this.descriptionDis;
     }
-    setStatusDis(statusDis){
-        this.statusDis = statusDis;
+    setStatus(status){
+        this.status = status;
     }
-    getStatusDis(){
-        return this.statusDis;
+    getStatus(){
+        return this.status;
     }
     
 }

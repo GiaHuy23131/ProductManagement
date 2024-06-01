@@ -10,7 +10,6 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import * as FileSystem from 'expo-file-system';
 // 
 import Manager from "../../Components/Manager";
-import ListColor from "../../Components/ListColor";
 import Color from "../../Class/Color";
 
 const ManagerProduct = () => {
@@ -75,10 +74,6 @@ const ManagerProduct = () => {
   }
   //Xử lý thêm
   const handleAddProduct = () => {
-    //const newIDPr = manager.epls.length > 0 ? Math.max(...manager.epls.map(item => item.idPr)) + 1 : 1;
-    //console.log('newID', newIDPr);
-    //set dữ liệu vào mảng
-    //setArrList(prevState => prevState.concat(manager.epls.map(item => ({ ...item, idPr: newIDPr })))); // Thêm ID mới vào mỗi phần tử trong arrList
     // Cập nhật arrList sau khi thêm sản phẩm mớ
     if (name == "") {
       return Alert.alert('Thông báo', 'Nhập tên');
@@ -91,9 +86,11 @@ const ManagerProduct = () => {
     } else if (description == "") {
       return Alert.alert('Nhập mô tả');
     } else {
+      //handleImage(arrListImage);
       manager.addProduct(id, name, type, price, description, color, arrListImage);
+  
       // Reset input fields 
-      navigation.navigate('ProductManagement');
+      navigation.navigate('Quản trị sản phẩm');
     }
 
   };
@@ -111,7 +108,7 @@ const ManagerProduct = () => {
       return Alert.alert('Nhập mô tả');
     } else {
       manager.updateProduct(id, name, type, price, description, color, arrListImage);
-      navigation.navigate('ProductManagement');
+      navigation.navigate('Quản trị sản phẩm');
     }
 
   };
@@ -174,8 +171,8 @@ const ManagerProduct = () => {
   }
 
   //log 
-  console.log('color', color);
-  console.log('image', arrListImage);
+  // console.log('color', color);
+  // console.log('image', arrListImage);
   return (
     <View style={styles.container}>
       <View style={styles.addProduct}>
@@ -270,10 +267,11 @@ const ManagerProduct = () => {
         data={arrListImage}
         renderItem={({ item }) => (
           <View style={styles.itemListImage}>
+            {item && <Image source={{ uri: item}} style={styles.image} />}
             <TouchableOpacity onPress={() => handleDeleteImage(item)}>
               <Text style={styles.deleteButton}>X</Text>
             </TouchableOpacity>
-            {item && <Image source={{ uri: item}} style={styles.image} />}
+            
           </View>
         )}
         keyExtractor={(item, index) => index.toString()}
@@ -401,8 +399,8 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     position: 'absolute',
-    top: 5,
-    right: 5,
+    right: 0,
+    bottom: 80,
     backgroundColor: 'red',
     paddingVertical: 5,
     paddingHorizontal: 10,

@@ -10,110 +10,82 @@ export default class Manager {
     constructor() {
         this.epls = [];
     }
+    async checkFileExists(imageUri) {
+        const fileInfo = await FileSystem.getInfoAsync(imageUri);
+        console.log('fileInfo',fileInfo);
+        if (!fileInfo.exists) {
+            throw new Error('File does not exist');
+        }
+        return fileInfo;
+    }
+    async  convertImageToBlob(imageUri) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = () => resolve(xhr.response);
+            xhr.onerror = () => reject(new TypeError('Network request failed'));
+            xhr.responseType = 'blob';
+            xhr.open('GET', imageUri, true);
+            xhr.send(null);
+        });
+    }
+    async uploadImage(idPr, imageUri) {
+        const blobImage = await this.convertImageToBlob(imageUri);
+        const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+        const storageRefs = storageRef(storage, `images/${idPr}/` + fileName);
+        const uploadTask = uploadBytesResumable(storageRefs, blobImage);
+    
+        return new Promise((resolve, reject) => {
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                },
+                (error) => {
+                    console.error('Upload failed', error);
+                    reject(error);
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    console.log('File available at', downloadURL);
+                    blobImage.close();
+                    resolve(downloadURL);
+                }
+            );
+        });
+    }
     //thêm sản phẩm
-    addProduct(idPr, namePr, typePr, pricePr, descriptionPr, colorPr, imagePr) {
+    async addProduct(idPr, namePr, typePr, pricePr, descriptionPr, colorPr, imagePr) {
         //test 
         // const newProduct = new Admin(idPr, namePr, typePr, pricePr, descriptionPr, imagePr);
         // this.epls.push(newProduct);
         //FireBase
-        const newKey = push(child(databaseRef(database), 'product')).key;//id ramdon
-        set(databaseRef(database, 'product/' + newKey), {
-            idPr: newKey,
-            namePr: namePr,
-            typePr: typePr,
-            pricePr: pricePr,
-            descriptionPr: descriptionPr,
-            colorPr: colorPr,
-            imagePr: imagePr,
-        }).then(() => {
-            Alert.alert('Thêm thành công');
-            this.imageUploading(newKey, imagePr);
-        })
-            .catch((error) => {
-                console.error(error);
-            });
-        //Api php
-        // fetch('http://192.168.232.194/apiProduct/createProduct.php', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         idPr: idPr,
-        //         namePr: namePr,
-        //         typePr: typePr,
-        //         pricePr: pricePr,
-        //         descriptionPr: descriptionPr,
-        //         imagePr: imagePr,
-        //     })
-        // }).then((response) => {
-        //     return response.json()
-        // })
-        //     .then((responseJson) => {
-        //         Alert.alert(JSON.stringify(responseJson));
-        //     }).catch((error) => {
-        //         console.error(error);
-        //     })
-    };
-    //Image upload
-    async imageUploading(idPr, imagePr) {
+        const newKey = push(child(databaseRef(database), 'product')).key;
         try {
-            for (const imageUri of imagePr) {
-                console.log('imagePr', imageUri);
-                //xử lý đường dẫn trong file
-                const fileInfo = await FileSystem.getInfoAsync(imageUri);
-                console.log('fileInfo', fileInfo);
-                if (!fileInfo.exists) {
-                    throw new Error('File does not exist');
-                }
-
-                // Chuyển đổi hình ảnh sang blob
-                const blobImage = await new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.onload = function () {
-                        resolve(xhr.response);
-                    };
-                    xhr.onerror = function () {
-                        reject(new TypeError('Network request failed'));
-                    };
-                    xhr.responseType = 'blob';
-                    xhr.open('GET', imageUri, true);
-                    xhr.send(null);
+            const downloadURLs = [];
+            await Promise.all(imagePr.map(async (imageUri) => {
+                await this.checkFileExists(imageUri);
+                const downloadURL = await this.uploadImage(newKey, imageUri);
+                downloadURLs.push(downloadURL);
+            }));
+            await set(databaseRef(database, 'product/' + newKey), {
+                idPr: newKey,
+                namePr: namePr,
+                typePr: typePr,
+                pricePr: pricePr,
+                descriptionPr: descriptionPr,
+                colorPr: colorPr,
+                imagePr: downloadURLs,
+            }).then(() => {
+                Alert.alert('Thêm thành công')
+            })
+                .catch((error) => {
+                    console.error(error);
                 });
-                console.log('imageUri', imageUri);
-                const fileName = imageUri.substring(imageUri.lastIndexOf('/') + 1);
-                //console.log('fileName',fileName);
-                const storageRefs = storageRef(storage, `images/${idPr}/` + fileName);
-                const uploadTask = uploadBytesResumable(storageRefs, blobImage);
-
-                // Giám sát quá trình tải lên
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        // Tiến trình tải lên
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log('Upload is ' + progress + '% done');
-                    },
-                    (error) => {
-                        // Xử lý lỗi tải lên
-                        console.error('Upload failed', error);
-                        setUploading(false);
-                    },
-                    async () => {
-                        // Xử lý khi tải lên hoàn tất
-                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        console.log('File available at', downloadURL);
-                        //Alert.alert('Image uploaded', 'Image uploaded successfully!');
-                        // Giải phóng blob
-                        blobImage.close();
-                    }
-                );
-            }
-            //Alert.alert('Image upload', 'All images have been uploaded successfully');
+    
         } catch (error) {
             console.error(error);
         }
-    }
+    };
     //xóa sản phẩm
     async removeProduct(idPr, imagePr) {
         //sắp xếp id
@@ -155,43 +127,32 @@ export default class Manager {
         }
     };
     //sửa sản phẩm
-    updateProduct(idPr, namePr, typePr, pricePr, descriptionPr, colorPr, imagePr) {
-        // fetch(`http://192.168.232.194/apiProduct/updateProduct.php?idPr=${idPr}`, {
-        //     method: "PUT",
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         idPr: idPr,
-        //         namePr: namePr,
-        //         typePr: typePr,
-        //         pricePr: pricePr,
-        //         descriptionPr: descriptionPr,
-        //         imagePr: imagePr,
-        //     })
-        // }).then((res) => {
-        //     return res.json()
-        // }).then((resJson) => {
-        //     Alert.alert(JSON.stringify(resJson));
-        // }).catch((err) => {
-        //     console.error('error: ', err);
-        // })
-        // A post entry.
-        update(databaseRef(database, 'product/' + idPr), {
-            namePr: namePr,
-            typePr: typePr,
-            pricePr: pricePr,
-            descriptionPr: descriptionPr,
-            colorPr: colorPr,
-            imagePr: imagePr,
-        }).then(() => {
-            Alert.alert('Sửa thành công')
-            this.imageUploading(idPr, imagePr);
-        })
-            .catch((error) => {
-                console.error(error);
-            });
+    async updateProduct(idPr, namePr, typePr, pricePr, descriptionPr, colorPr, imagePr) {
+        try {
+            const downloadURLs = [];
+            await Promise.all(imagePr.map(async (imageUri) => {
+                const downloadURL = await this.uploadImage(idPr, imageUri);
+                downloadURLs.push(downloadURL);
+            }));    
+            update(databaseRef(database, 'product/' + idPr), {
+                namePr: namePr,
+                typePr: typePr,
+                pricePr: pricePr,
+                descriptionPr: descriptionPr,
+                colorPr: colorPr,
+                imagePr: downloadURLs,
+            }).then(() => {
+                Alert.alert('Sửa thành công')
+                console.log('downloadURLs',downloadURLs);
+            })
+                .catch((error) => {
+                    console.error(error);
+                });
+    
+        } catch (error) {
+            console.error(error);
+        }
+        
     }
     //xóa hình ảnh
     // removeImage(imagePr) {

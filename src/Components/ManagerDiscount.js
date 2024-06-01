@@ -8,16 +8,16 @@ export default class ManagerDiscount {
         this.epls = [];
     }
     //thêm sản phẩm
-    addDiscount(idDis, nameDis,codeDis, priceDis,descriptionDis,statusDis) {
+    addDiscount(id, nameDis,code, percentage,descriptionDis,status) {
         //FireBase
-        const newKey = push(child(ref(database), 'discount')).key;//id ramdon
-        set(ref(database, 'discount/' + newKey), {
-            idDis: newKey,
+        const newKey = push(child(ref(database), 'Discount')).key;//id ramdon
+        set(ref(database, 'Discount/' + newKey), {
+            id: newKey,
             nameDis: nameDis,
-            codeDis: codeDis,
-            priceDis: priceDis,
+            code: code,
+            percentage: percentage,
             descriptionDis: descriptionDis,
-            statusDis: statusDis,
+            status: status,
         }).then(() => {
             Alert.alert('Thêm thành công')
         })
@@ -26,18 +26,18 @@ export default class ManagerDiscount {
             });
     };
     //xóa sản phẩm
-    removeDiscount(idDis) {
-        remove(ref(database, 'discount/' + idDis));
+    removeDiscount(id) {
+        remove(ref(database, 'Discount/' + id));
         alert('remove');
     };
     //sửa sản phẩm
-    updateDiscount(idDis, nameDis,codeDis, priceDis,descriptionDis,statusDis) {
-        update(ref(database, 'discount/' + idDis), {
+    updateDiscount(id, nameDis,code, percentage,descriptionDis,status) {
+        update(ref(database, 'Discount/' + id), {
             nameDis: nameDis,
-            codeDis: codeDis,
-            priceDis: priceDis,
+            code: code,
+            percentage: percentage,
             descriptionDis: descriptionDis,
-            statusDis: statusDis,
+            status: status,
         }).then(() => {
             Alert.alert('Sửa thành công')
         })
