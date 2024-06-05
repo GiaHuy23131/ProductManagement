@@ -10,7 +10,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import * as FileSystem from 'expo-file-system';
 // 
 import Manager from "../../Components/Manager";
-import Color from "../../Class/Color";
+import Color from "../../Models/Color";
 
 const ManagerProduct = () => {
 

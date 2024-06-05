@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import React, { Component, useState, useEffect } from "react";
-import Admin from "../Class/Admin";
+import Admin from "../Models/Admin";
 import { storage, database } from "../FireBase/firebaseConfig";
 import { child, push, ref as databaseRef, set, remove, update } from "firebase/database";
 import { ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject, getMetadata } from "firebase/storage";

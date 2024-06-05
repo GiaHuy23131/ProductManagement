@@ -7,7 +7,6 @@ import { onValue, update, push, ref, set, child, get,remove } from "firebase/dat
 const ProductConfirmation = () => {
     const navigation = useNavigation(); // Sử dụng hook navigation
     const [arrListBill, setArrListBill] = useState([]);
-    const [processedItems, setProcessedItems] = useState([]);
     const getListBill = () => {
         const db = ref(database, 'Bill/')
         onValue(db, (snapshot) => {
@@ -54,7 +53,6 @@ const ProductConfirmation = () => {
         getListBill();
     }, []);
     //console.log('arrListBill', arrListBill);
-    console.log('processedItems', processedItems);
     return (
         <View style={styles.homeManager}>
             <FlatList
@@ -109,7 +107,7 @@ const ProductConfirmation = () => {
                         </View>
                     </TouchableOpacity>
                 )}
-                keyExtractor={(item, index) => item.idPr}
+                keyExtractor={(item) => item.id}
             />
         </View>
 

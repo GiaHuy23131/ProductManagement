@@ -16,16 +16,12 @@ import DiscountCode from './src/screen/DiscountCode/DiscountCode';
 import Login from './src/screen/Login/Login';
 import ProductConfirmation from './src/screen/ProductConfirmation/ProductConfirmation';
 import ProductDetail from './src/screen/ProductConfirmation/ProductDetail';
+import Statistics from './src/screen/Statistics/Statistics';
 
 const ProductManagementStack = createNativeStackNavigator();
 //Product
 const ProductManagementStackScreen = () => {
   const navigation = useNavigation();
-  const logOut = () => {
-    auth.signOut().then(() => {
-      navigation.navigate('Login');
-    })
-  }
   return (
     <ProductManagementStack.Navigator>
       <ProductManagementStack.Screen
@@ -43,14 +39,6 @@ const ProductManagementStackScreen = () => {
               />
             )
           },
-          headerRight: () => (
-            <Icon
-              name="log-out"
-              onPress={logOut}
-              size={30}
-              color="black"
-            />
-          ),
         }} />
       <ProductManagementStack.Screen name='Sản phẩm' component={Product} options={{ headerTitleAlign: 'center' }} />
     </ProductManagementStack.Navigator>
@@ -84,6 +72,11 @@ const DiscountCodeManagementStackScreen = () => {
 //ProductConfirmation
 const ProductConfirmationtStackScreen = () => {
   const navigation = useNavigation();
+  const logOut = () => {
+    auth.signOut().then(() => {
+      navigation.navigate('Login');
+    })
+  }
   return (
     <ProductManagementStack.Navigator>
       <ProductManagementStack.Screen
@@ -100,9 +93,41 @@ const ProductConfirmationtStackScreen = () => {
                 color="black"
               />
             )
-          }
+          },
+          headerRight: () => (
+            <Icon
+              name="log-out"
+              onPress={logOut}
+              size={30}
+              color="black"
+            />
+          ),
         }} />
       <ProductManagementStack.Screen name='Chi tiết sản phẩm' component={ProductDetail} options={{ headerTitleAlign: 'center' }} />
+    </ProductManagementStack.Navigator>
+  )
+}
+//Statisticst
+const StatisticstStackScreen = () => {
+  const navigation = useNavigation();
+  return (
+    <ProductManagementStack.Navigator>
+      <ProductManagementStack.Screen
+        name='Số liệu thông kê'
+        component={Statistics}
+        options={{
+          headerTitleAlign: 'center',
+          headerLeft: () => {
+            return (
+              <Icon
+                name="menu"
+                onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                size={30}
+                color="black"
+              />
+            )
+          },
+        }} />
     </ProductManagementStack.Navigator>
   )
 }
@@ -136,6 +161,15 @@ const DrawerNav = () => {
         options={{
           drawerIcon: ({color, size }) => (
             <Icon name="price-tag" size={size} color={color} />
+          )
+        }}
+      />
+       <Drawer.Screen
+        name='Số liệu thống kê'
+        component={StatisticstStackScreen}
+        options={{
+          drawerIcon: ({color, size }) => (
+            <Icon name="pie-chart" size={size} color={color} />
           )
         }}
       />

@@ -55,7 +55,7 @@ const ProductDetail = () => {
 
                     </View>
                 )}
-                keyExtractor={(item, index) => item.idPr}
+                keyExtractor={(item) => item.id}
             />
         </View>
 

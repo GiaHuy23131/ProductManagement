@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import Discount from "../Class/Discount";
+import Discount from "../Models/Discount";
 import { database } from "../FireBase/firebaseConfig";
 import { child, push, ref, set, remove,update } from "firebase/database";
 

@@ -17,18 +17,6 @@ const HomeManager = () =>{
     //đọc dữ liệu API PHP   
     //Đọc dữ liệu firebase
       const getListProduct = () => {
-        // fetch('http://192.168.232.194/apiProduct/readProduct.php',{ 
-        //   method: "GET"
-        // }).then(res => { 
-        //   return res.json();
-        // }).then(resJson => {
-        //   if(resJson){
-        //     console.log('resJson', resJson);
-        //     setArrList(resJson); 
-        //   } 
-        // }).catch(err => {
-        //   console.log('err',err); 
-        // }) 
         const db = ref(database,'product/')
         onValue(db,(snapshot) => {
           const data = snapshot.val();
@@ -44,22 +32,6 @@ const HomeManager = () =>{
     //xử lý xóa
     const removeProduct = (idPr,imagePr) => { 
       manager.removeProduct(idPr,imagePr);
-      //       method: "DELETE",
-      //       headers: {
-      //           'Accept': 'application/json',
-      //           'Content-Type': 'application/json'
-      //       },
-      //       body: JSON.stringify({
-      //           idPr: idPr, 
-      //       })
-      //   }).then((response) => {
-      //       return response.json()
-      //   }).then((responseJson) => {
-      //       Alert.alert(JSON.stringify(responseJson));
-      //   }).catch((error) => {
-      //       console.error('error: ', error);
-      //   })
-      //   setArrList(removeList);
     }; 
     //cập nhật lại dữ liệu     
     useEffect(() => {  
